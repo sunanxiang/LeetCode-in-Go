@@ -65,7 +65,7 @@ func (lc *leetcode) save() {
 		log.Fatal("无法把Leetcode数据转换成[]bytes: ", err)
 	}
 	if err = ioutil.WriteFile(leetCodeJSON, raw, 0666); err != nil {
-		log.Fatal("无法把Marshal后的lc保存到文件: ", err)
+		log.Fatal("无法把 Marshal 后的 lc 保存到文件: ", err)
 	}
 	log.Println("最新的 LeetCode 记录已经保存。")
 	return
@@ -79,6 +79,7 @@ func (lc *leetcode) refresh() {
 
 	log.Println("开始，刷新 LeetCode 数据")
 	newLC := getLeetCode()
+
 	logDiff(lc, newLC)
 
 	*lc = *newLC
@@ -94,12 +95,13 @@ func logDiff(old, new *leetcode) {
 	str += fmt.Sprintf("，%s了 %d 名", verb, delta)
 	log.Println(str)
 
-	// 检查新旧都有的问题
 	lenOld, lenNew := len(old.Problems), len(new.Problems)
 	hasNewFinished := false
 
 	i := 0
-	for i < lenOld {
+
+	// 检查新旧都有的问题
+	for i < lenOld && i < lenNew {
 		o, n := old.Problems[i], new.Problems[i]
 		// 检查是 n 是否是新 完成
 		if o.IsAccepted == false && n.IsAccepted == true {
@@ -111,10 +113,21 @@ func logDiff(old, new *leetcode) {
 		if o.IsFavor == false && n.IsFavor == true {
 			log.Printf("～新收藏～ %d - %s", n.ID, n.Title)
 			dida("fa", n)
+		} else if o.IsFavor == true && n.IsFavor == false {
+			log.Printf("～取消收藏～ %d - %s", o.ID, o.Title)
+			time.Sleep(time.Second)
+		}
+
+		// 有时候，会在中间添加新题
+		if o.Title == "" && n.Title != "" {
+			log.Printf("新题: %d - %s", new.Problems[i].ID, new.Problems[i].Title)
+			dida("do", n)
 		}
 
 		i++
 	}
+
+	log.Printf("已经检查完了 %d 题\n", i)
 
 	if !hasNewFinished {
 		log.Println("～ 没有新完成习题 ～")
@@ -122,10 +135,28 @@ func logDiff(old, new *leetcode) {
 
 	// 检查新添加的习题
 	for i < lenNew {
-		if new.Problems[i].isAvailble() {
+		if new.Problems[i].isAvailable() {
 			log.Printf("新题: %d - %s", new.Problems[i].ID, new.Problems[i].Title)
 			dida("do", new.Problems[i])
-			i++
 		}
+		i++
 	}
+}
+
+func (lc *leetcode) ProgressTable() string {
+	return lc.Record.progressTable()
+}
+
+func (lc *leetcode) AvailableTable() string {
+	return lc.Problems.available().table()
+}
+
+func (lc *leetcode) FavoriteTable() string {
+	return lc.Problems.favorite().table()
+}
+
+func (lc *leetcode) UnavailableList() string {
+	res := lc.Problems.unavailable().list()
+	// 为了 README.md 文档的美观，需要删除最后一个换行符号
+	return res[:len(res)-1]
 }

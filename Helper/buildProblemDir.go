@@ -68,7 +68,7 @@ func build(p problem) {
 
 	fc := getFunction(p.link())
 
-	fcName, para, ans := parseFunction(fc)
+	fcName, para, ans, fc := parseFunction(fc)
 
 	creatGo(p, fc, ans)
 
@@ -113,6 +113,7 @@ func creatGo(p problem, function, ansType string) {
 
 %s
 `
+
 	content := fmt.Sprintf(fileFormat, p.packageName(), function)
 
 	returns := "\treturn nil\n}"
@@ -137,6 +138,8 @@ func creatGoTest(p problem, fcName, para, ansType string) {
 	
 	// 可以有多个 testcase
 }`
+
+	para = strings.Replace(para, ",", "\n", -1)
 
 	testCases := fmt.Sprintf(testCasesFormat, para, ansType)
 

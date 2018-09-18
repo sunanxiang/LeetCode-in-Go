@@ -30,6 +30,7 @@ func mailToDida(task string) {
 	m := gomail.NewMessage()
 	m.SetHeader("From", cfg.From)
 	m.SetHeader("To", cfg.To)
+	task += " ^LeetCode "
 	task = delay(task)
 	m.SetHeader("Subject", task)
 	m.SetBody("text/plain", fmt.Sprintf("添加日期 %s", time.Now()))
@@ -72,10 +73,9 @@ var m = map[string]time.Duration{
 
 func delay(task string) string {
 	key := task[:3]
-	task += " ^LeetCode "
 	if day, ok := m[key]; ok {
 		task += time.Now().Add(time.Hour * 24 * day).Format("2006-01-02")
-		m[key]++
+		m[key] += 2
 	}
 	return task
 }

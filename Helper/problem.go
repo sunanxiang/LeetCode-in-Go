@@ -34,7 +34,7 @@ func newProblem(ps problemStatus) problem {
 	return p
 }
 
-func (p problem) isAvailble() bool {
+func (p problem) isAvailable() bool {
 	if p.ID == 0 || p.IsPaid || p.HasNoGoOption {
 		return false
 	}
@@ -59,7 +59,7 @@ func (p problem) tableLine() string {
 	if p.IsAccepted {
 		t = fmt.Sprintf(`[%s](%s)`, strings.TrimSpace(p.Title), p.Dir())
 	} else {
-		t = fmt.Sprintf(` * %s`, p.Title)
+		t = fmt.Sprintf(` * [%s](%s)`, p.Title, p.link())
 	}
 	if p.IsNew {
 		t += " :new: "
