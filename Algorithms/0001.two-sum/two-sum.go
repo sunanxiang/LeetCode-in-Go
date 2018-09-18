@@ -20,3 +20,5 @@ func twoSum(nums []int, target int) []int {
 
 	return nil
 }
+
+// 注意slice和map的搭配使用，可以解决很多问题。(数组去重中也使用了slice 和map 的搭配问题)
